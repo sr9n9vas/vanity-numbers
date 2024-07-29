@@ -1,23 +1,49 @@
-import logo from './logo.svg';
+import React, { useState } from 'react';
+import axios from 'axios';
 import './App.css';
 
 function App() {
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [result, setResult] = useState('');
+
+  const handleInputChange = (event) => {
+    setPhoneNumber(event.target.value);
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    fetchData(phoneNumber);
+  };
+
+  const fetchData = (query) => {
+    axios.post('https://i31rmr8cef.execute-api.ap-south-1.amazonaws.com/vanity-numbers', {
+      "phoneNumber": query
+    })
+      .then(response => {
+        setResult(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+      });
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <form onSubmit={handleSubmit}>
+        <label>
+          Enter Phone number:
+          <input type="text" value={phoneNumber} onChange={handleInputChange} />
+        </label>
+        <button type="submit">Submit</button>
+      </form>
+      <div>
+        <h2>Top Vanity Numbers:</h2>
+        <ul>
+          <pre>
+            {JSON.stringify(result, null, 2)}
+          </pre>
+        </ul>
+      </div>
     </div>
   );
 }
